@@ -8,8 +8,7 @@
    [boot.tmpdir     :as tmpd]))
 
 (def ^:private deps
-  '[[slingshot "0.12.1"]
-    [org.webjars/less-node "2.1.0"]])
+  '[[slingshot "0.12.1"]])
 
 (core/deftask less
   "Compile Less code."
