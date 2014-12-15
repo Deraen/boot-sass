@@ -25,19 +25,19 @@
                       core/input-files
                       (core/by-ext [".less"]))]
         (reset! last-less fileset)
-        (if (seq less)
-          (do
-            (util/info (str "Compiling {less}..." (count less) " changed files."))
-            ; FIXME: Predicate checking just the first char of filename would be faster
-            (let [main-files (core/by-re [#"[^_].*"] less)]
-              (doseq [f main-files]
-                (pod/with-call-in
-                  @p
-                  (deraen.boot-less.impl/less-compile
-                    ~(.getPath (tmpd/file f))
-                    ~(.getPath tmp)
-                    ~(tmpd/path f)))))
-            (-> fileset
-                (core/add-resource tmp)
-                core/commit!))
-          fileset)))))
+        (when (seq less)
+          (util/info (str "Compiling {less}..." (count less) " changed files."))
+          (let [main-files (->> fileset
+                                core/input-files
+                                (core/by-ext [".less"])
+                                (core/not-by-re [#"_.*"]))]
+            (doseq [f main-files]
+              (pod/with-call-in
+                @p
+                (deraen.boot-less.impl/less-compile
+                  ~(.getPath (tmpd/file f))
+                  ~(.getPath tmp)
+                  ~(tmpd/path f))))))
+        (-> fileset
+            (core/add-resource tmp)
+            core/commit!)))))

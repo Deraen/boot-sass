@@ -19,3 +19,6 @@ equivalent `.css` file.
 - [ ] Separate JS engine stuff to small library
 - [ ] How to read files from classpath
   - E.g. Bootstrap as maven dependency from Webjars
+- [ ] Set main file manually
+  - If no main file set, other files should start with \_
+  - if set, other files can be named in any way
