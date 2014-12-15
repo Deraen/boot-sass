@@ -13,8 +13,7 @@
 (core/deftask less
   "Compile Less code."
   []
-  (let [rules       [:clj :cljs]
-        tmp         (core/temp-dir!)
+  (let [tmp         (core/temp-dir!)
         p           (-> (core/get-env)
                         (update-in [:dependencies] into deps)
                         pod/make-pod
