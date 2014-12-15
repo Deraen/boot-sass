@@ -8,7 +8,8 @@
    [boot.tmpdir     :as tmpd]))
 
 (def ^:private deps
-  '[])
+  '[[slingshot "0.12.1"]
+    [org.webjars/less-node "2.1.0"]])
 
 (core/deftask less
   "Compile Less code."
@@ -29,14 +30,15 @@
         (if (seq less)
           (do
             (util/info (str "Compiling {less}..." (count less) " changed files."))
-            (doseq [r rules
-                    f less]
-              (pod/with-call-in @p
-                (deraen.boot-less.impl/less-compile
-                  ~r
-                  ~(.getPath (tmpd/file f))
-                  ~(.getPath tmp)
-                  ~(tmpd/path f))))
+            ; FIXME: Predicate checking just the first char of filename would be faster
+            (let [main-files (core/by-re [#"[^_].*"] less)]
+              (doseq [f main-files]
+                (pod/with-call-in
+                  @p
+                  (deraen.boot-less.impl/less-compile
+                    ~(.getPath (tmpd/file f))
+                    ~(.getPath tmp)
+                    ~(tmpd/path f)))))
             (-> fileset
                 (core/add-resource tmp)
                 core/commit!))

@@ -1,34 +1,21 @@
-# boot-cljx
-[![Clojars Project](http://clojars.org/deraen/boot-cljx/latest-version.svg)](http://clojars.org/deraen/boot-cljx)
+# boot-less
+[![Clojars Project](http://clojars.org/deraen/boot-less/latest-version.svg)](http://clojars.org/deraen/boot-less)
 
-[Boot](https://github.com/boot-clj/boot) task to compile Cljx.
+[Boot](https://github.com/boot-clj/boot) task to compile Less.
 
-* Provides the `cljx` task
-* Reads `.cljx` files from `:src-paths` and creates corresponding `.clj`
-and `.cljs` files. Resulting files are available to others tasks through
-`src-files`.
-
-## Use
-
-```clojure
-; All files (.clj, .cljx, .cljs) could be on the same directory,
-; but I like to have separate directories per filetype.
-(set-env! :src-paths #{"src/cljx" "src/clj" "src/cljs"})
-
-; Run cljx before cljs
-; $ boot cljx cljs ...
-(deftask package
-  "Package the app"
-  []
-  (comp
-    (cljx)
-    (cljs)
-    ...))
-```
+* Provides the `less` task
+* Reads `.less` files from fileset...
+* For each `.less` file not starting with \_ (underscore), creates
+equivalent `.css` file.
+* Uses Less.js through Java 1.8 Nashorn JS engine.
 
 ## TODO
 
+- [ ] Update to latest LESS
 - [ ] Handle errors
-  - Does cljx throw any errors?
-- [ ] What options should there be?
-  - No options needed for now
+- [ ] Use non-bundled Less files
+  - Webjars has less-node, but the files are not concatenated
+  - Parhaps we'll need to package ourselves
+- [ ] Separate JS engine stuff to small library
+- [ ] How to read files from classpath
+  - E.g. Bootstrap as maven dependency from Webjars

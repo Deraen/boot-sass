@@ -1,5 +1,6 @@
 (set-env!
   :resource-paths #{"src"}
+  :asset-paths #{"resources"}
   :dependencies   '[[org.clojure/clojure "1.6.0"       :scope "provided"]
                     [boot/core           "2.0.0-pre28" :scope "provided"]
                     [adzerk/bootlaces    "0.1.5"       :scope "test"]
@@ -25,7 +26,6 @@
   []
   (comp
     (watch)
-    (speak)
     (repl :server true)
     (pom)
     (jar)
