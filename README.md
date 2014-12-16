@@ -20,7 +20,7 @@ equivalent `.css` file.
 - [ ] Separate JS engine stuff to small library
 - [ ] How to read files from classpath
   - E.g. Bootstrap as maven dependency from Webjars
-  - Create custom "node-nashorn" implementing fileManager.loadFile which tries to locate files in classpath (https://github.com/less/less.js/blob/master/lib/less-node/file-manager.js)
+  - Create custom "less-nashorn" implementing fileManager.loadFile which tries to locate files in classpath (https://github.com/less/less.js/blob/master/lib/less-node/file-manager.js)
 - [ ] Set main file manually
   - If no main file set, other files should start with \_
   - if set, other files can be named in any way
