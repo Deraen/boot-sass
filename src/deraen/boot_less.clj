@@ -26,7 +26,7 @@
                       (core/by-ext [".less"]))]
         (reset! last-less fileset)
         (when (seq less)
-          (util/info (str "Compiling {less}..." (count less) " changed files."))
+          (util/info (str "Compiling {less}..." (count less) " changed files.\n"))
           (let [main-files (->> fileset
                                 core/input-files
                                 (core/by-ext [".less"])
