@@ -4,6 +4,7 @@
     [clojure.string :as s]
     [slingshot.slingshot :refer [throw+ try+]])
   (:import
+    [java.net URL]
     [javax.script ScriptEngineManager ScriptEngine ScriptContext Bindings]
     [jdk.nashorn.api.scripting ScriptObjectMirror JSObject]))
 
@@ -57,28 +58,30 @@
                   [(keyword k) (.get obj k)])
                 (.getOwnKeys obj true))))
 
-(defrecord Import [contents path])
+(defrecord Import [path])
 
 (defn load-local-file [file current-dir]
   (let [f (io/file current-dir file)]
     (if (.exists f)
-      (map->Import {:path (.getAbsolutePath f)
-                    :contents (slurp f)}))))
+      (map->Import {:path (.getAbsolutePath f)}))))
 
-(defn load-webjars-file [_ _]
+(defn load-webjars [_ _]
   nil)
 
 (defn load-resource [file _]
   (if-let [r (io/resource file)]
-    (map->Import {:path (.toString r)
-                  :contents (slurp r)})))
+    (map->Import {:path (.toString r)})))
 
 (defn load-in-jar-file
   "E.g. variables.less, jar:file:/home/juho...bootstrap.jar!META-INT/..."
   [file current-dir]
   (try
-    (map->Import {:path (str current-dir "/" file)
-                  :contents (slurp (str current-dir "/" file))})))
+    ; Throws a exception if file is not found on the jar
+    ; But creates inputstream if found. But nothing is read from stream?
+    (.getContent (URL. (str current-dir "/" file)))
+    (map->Import {:path (str current-dir "/" file)})
+    (catch Throwable _
+      nil)))
 
 (defn find-import [file current]
   (let [{:keys [currentDirectory]} (nashorn->clj current)]

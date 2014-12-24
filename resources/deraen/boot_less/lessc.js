@@ -24,8 +24,13 @@ var lessc = {};
         }
 
         var href = result.path;
-        var data = result.contents;
-        print(href);
+        var data = null;
+        try {
+            data = lessc.read(href);
+        } catch (e) {
+            callback({ type: 'File', message: '"' + less.modules.path.basename(href) + '" couln\'t be read' });
+            return;
+        }
         var path = less.modules.path.dirname(href);
 
         var newFileInfo = {
