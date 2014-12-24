@@ -3,7 +3,9 @@
     [clojure.java.io :as io]
     [clojure.string :as s]
     [slingshot.slingshot :refer [throw+ try+]])
-  (:import (javax.script ScriptEngineManager ScriptEngine ScriptContext Bindings)))
+  (:import
+    [javax.script ScriptEngineManager ScriptEngine ScriptContext Bindings]
+    [jdk.nashorn.api.scripting ScriptObjectMirror JSObject]))
 
 (def less-js "deraen/boot_less/less-rhino-1.7.2.js")
 (def lessc-js "deraen/boot_less/lessc.js")
@@ -44,4 +46,43 @@
 (defn less-compile [path target-dir relative-path]
   (js-engine)
   (let [output-file (io/file target-dir (change-file-ext relative-path "css"))]
+    (io/make-parents output-file)
     (eval! @stored-engine (format "lessc.compile('%s', '%s');" path output-file))))
+
+(defn error! [error message]
+  (println error message))
+
+(defn nashorn->clj [obj]
+  (into {} (map (fn [k]
+                  [(keyword k) (.get obj k)])
+                (.getOwnKeys obj true))))
+
+(defrecord Import [contents path])
+
+(defn load-local-file [file current-dir]
+  (let [f (io/file current-dir file)]
+    (if (.exists f)
+      (map->Import {:path (.getAbsolutePath f)
+                    :contents (slurp f)}))))
+
+(defn load-webjars-file [_ _]
+  nil)
+
+(defn load-resource [file _]
+  (if-let [r (io/resource file)]
+    (map->Import {:path (.toString r)
+                  :contents (slurp r)})))
+
+(defn load-in-jar-file
+  "E.g. variables.less, jar:file:/home/juho...bootstrap.jar!META-INT/..."
+  [file current-dir]
+  (try
+    (map->Import {:path (str current-dir "/" file)
+                  :contents (slurp (str current-dir "/" file))})))
+
+(defn find-import [file current]
+  (let [{:keys [currentDirectory]} (nashorn->clj current)]
+    (or (load-local-file file currentDirectory)
+        (load-webjars file currentDirectory)
+        (load-resource file currentDirectory)
+        (load-in-jar-file file currentDirectory))))

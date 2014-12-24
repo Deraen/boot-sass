@@ -1,70 +1,78 @@
+/* global less */
 var lessc = {};
 
-less.Parser.fileLoader = function (file, currentFileInfo, callback, env) {
+(function () {
+    var RT;
+    var type;
 
-    var href = file;
-    if (currentFileInfo && currentFileInfo.currentDirectory && !/^\//.test(file)) {
-        href = less.modules.path.join(currentFileInfo.currentDirectory, file);
+    if ((typeof importClass) !== 'undefined') {
+        importClass(Packages.clojure.lang.RT);
+        RT = Packages.clojure.lang.RT;
+        type = 'rhino';
+    }
+    if ((typeof Java) !== 'undefined' && Java.type) {
+        RT = Java.type('clojure.lang.RT');
+        type = 'nashorn';
     }
 
-    var path = less.modules.path.dirname(href);
+    var find_import = RT['var']('deraen.boot-less.impl', 'find-import');
+    less.Parser.fileLoader = function (file, currentFileInfo, callback, env) {
+        var result = find_import.invoke(file, currentFileInfo);
+        if (!result) {
+            callback({ type: 'File', message: '"' + less.modules.path.basename(file) + '" wasn\'t found' });
+            return;
+        }
 
-    var newFileInfo = {
-        currentDirectory: path + '/',
-        filename: href
+        var href = result.path;
+        var data = result.contents;
+        print(href);
+        var path = less.modules.path.dirname(href);
+
+        var newFileInfo = {
+            currentDirectory: path,
+            filename: href
+        };
+
+        if (currentFileInfo) {
+            newFileInfo.entryPath = currentFileInfo.entryPath;
+            newFileInfo.rootpath = currentFileInfo.rootpath;
+            newFileInfo.rootFilename = currentFileInfo.rootFilename;
+            newFileInfo.relativeUrls = currentFileInfo.relativeUrls;
+        } else {
+            newFileInfo.entryPath = path;
+            newFileInfo.rootpath = less.rootpath || path;
+            newFileInfo.rootFilename = href;
+            newFileInfo.relativeUrls = env.relativeUrls;
+        }
+
+        var j = file.lastIndexOf('/');
+        if (newFileInfo.relativeUrls && !/^(?:[a-z-]+:|\/)/.test(file) && j !== -1) {
+            var relativeSubDirectory = file.slice(0, j + 1);
+            newFileInfo.rootpath = newFileInfo.rootpath + relativeSubDirectory; // append (sub|sup) directory path of imported file
+        }
+
+        try {
+            callback(null, data, href, newFileInfo, { lastModified: 0 });
+        } catch (e) {
+            callback(e, null, href);
+        }
     };
 
-    if (currentFileInfo) {
-        newFileInfo.entryPath = currentFileInfo.entryPath;
-        newFileInfo.rootpath = currentFileInfo.rootpath;
-        newFileInfo.rootFilename = currentFileInfo.rootFilename;
-        newFileInfo.relativeUrls = currentFileInfo.relativeUrls;
-    } else {
-        newFileInfo.entryPath = path;
-        newFileInfo.rootpath = less.rootpath || path;
-        newFileInfo.rootFilename = href;
-        newFileInfo.relativeUrls = env.relativeUrls;
-    }
-
-    var j = file.lastIndexOf('/');
-    if (newFileInfo.relativeUrls && !/^(?:[a-z-]+:|\/)/.test(file) && j != -1) {
-        var relativeSubDirectory = file.slice(0, j + 1);
-        newFileInfo.rootpath = newFileInfo.rootpath + relativeSubDirectory; // append (sub|sup) directory path of imported file
-    }
-    newFileInfo.currentDirectory = path;
-    newFileInfo.filename = href;
-
-    var data = null;
-    try {
-        data = lessc.read(href);
-    } catch (e) {
-        callback({ type: 'File', message: "'" + less.modules.path.basename(href) + "' wasn't found" });
-        return;
-    }
-
-    try {
-        callback(null, data, href, newFileInfo, { lastModified: 0 });
-    } catch (e) {
-        callback(e, null, href);
-    }
-};
-
-(function () {
     /* derived from lessc-rhino */
     lessc.formatError = function formatError(ctx, options) {
         options = options || {};
 
-        var message = "";
+        var message = '';
         var extract = ctx.extract;
         var error = [];
 
         // only output a stack if it isn't a less error
         if (ctx.stack && !ctx.type) {
-            return ctx.message + "\r\n" + ctx.stack;
+            return ctx.message + '\r\n' + ctx.stack;
         }
 
         if (!ctx.hasOwnProperty || !ctx.hasOwnProperty('index') || !extract) {
-            return ctx.message + "\r\n" + ctx.stack;
+            return ctx.message + '\r\n' + ctx.stack;
         }
 
         if (typeof(extract[0]) === 'string') {
@@ -74,8 +82,7 @@ less.Parser.fileLoader = function (file, currentFileInfo, callback, env) {
         if (typeof(extract[1]) === 'string') {
             var errorTxt = ctx.line + ' ';
             if (extract[1]) {
-                errorTxt += extract[1].slice(0, ctx.column)
-                    + extract[1][ctx.column] + extract[1].slice(ctx.column + 1);
+                errorTxt += extract[1].slice(0, ctx.column) + extract[1][ctx.column] + extract[1].slice(ctx.column + 1);
             }
             error.push(errorTxt);
         }
@@ -98,48 +105,32 @@ less.Parser.fileLoader = function (file, currentFileInfo, callback, env) {
         }
 
         return message;
-    }
-})();
-
-(function () {
-    var RT;
-    var type;
-
-    if ((typeof importClass) != "undefined") {
-        importClass(Packages.clojure.lang.RT);
-        RT = Packages.clojure.lang.RT;
-        type = "rhino";
-    }
-    if ((typeof Java) != "undefined" && Java.type) {
-        RT = Java.type("clojure.lang.RT");
-        type = "nashorn";
-    }
-
-    var slurp_var = RT['var']("clojure.core", "slurp");
-    lessc.read = function (filename, encoding) {
-        return String(slurp_var['invoke'](filename));
     };
 
-    var spit_var = RT['var']("clojure.core", "spit");
+    var slurp_var = RT['var']('clojure.core', 'slurp');
+    lessc.read = function (filename, encoding) {
+        return String(slurp_var.invoke(filename));
+    };
+
+    var spit_var = RT['var']('clojure.core', 'spit');
     lessc.write = function (filename, content) {
-        spit_var['invoke'](filename, content);
+        spit_var.invoke(filename, content);
         return undefined;
     };
 
-    var error_var = RT['var']("leiningen.less.engine", "error!");
+    var error_var = RT['var']('deraen.boot-less.impl', 'error!');
     lessc.error = function (ctx, options) {
         var message = lessc.formatError(ctx, options);
         if (ctx.javaException) {
-            error_var['invoke'](ctx.javaException, message);
-        }
-        else {
-            error_var['invoke'](ctx, message);
+            error_var.invoke(ctx.javaException, message);
+        } else {
+            error_var.invoke(ctx, message);
         }
     };
 
-    var quit = new Error("quit");
+    var quit = new Error('quit');
 
-    lessc.quit = function (code) {
+    lessc.quit = function () {
         throw quit;
     };
 
@@ -160,12 +151,12 @@ less.Parser.fileLoader = function (file, currentFileInfo, callback, env) {
             });
         }
         catch (e) {
-            if (e == quit) {
+            if (e === quit) {
                 return 0;
             }
             else {
                 lessc.error(e, options);
             }
         }
-    }
+    };
 })();
