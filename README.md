@@ -12,11 +12,11 @@ equivalent `.css` file.
 ## Features
 
 - Load imports from classpath
-  - Loading order. `@import "foo";`
-    1. check if `src/less/foo.less` exists
-    2. try `(io/resource "foo.less")`
-    3. try `(io/resource "src/less/foo.less")`
-    4. check if webjars asset map contains `foo`
+  - Loading order. `@import "{name}";` at `{path}`.
+    1. check if `{path}/{name}.less` exists
+    2. try `(io/resource "{name}.less")`
+    3. try `(io/resource "{path}/{name}.less")`
+    4. check if webjars asset map contains `{name}`
   - You should be able to depend on `[org.webjars/bootstrap "3.3.1"]`
     and use `@import "bootstrap/less/bootstrap";`
 
