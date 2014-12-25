@@ -8,12 +8,13 @@
    [boot.tmpdir     :as tmpd]))
 
 (def ^:private deps
-  '[[slingshot "0.12.1"]])
+  '[[org.webjars/webjars-locator "0.19"]
+    [org.slf4j/slf4j-nop "1.7.7"]])
 
 (core/deftask less
   "Compile Less code."
   []
-  (let [tmp         (core/temp-dir!)
+  (let [output-dir  (core/temp-dir!)
         p           (-> (core/get-env)
                         (update-in [:dependencies] into deps)
                         pod/make-pod
@@ -36,8 +37,8 @@
                 @p
                 (deraen.boot-less.impl/less-compile
                   ~(.getPath (tmpd/file f))
-                  ~(.getPath tmp)
+                  ~(.getPath output-dir)
                   ~(tmpd/path f))))))
         (-> fileset
-            (core/add-resource tmp)
+            (core/add-resource output-dir)
             core/commit!)))))

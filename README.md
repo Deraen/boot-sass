@@ -9,6 +9,17 @@
 equivalent `.css` file.
 * Uses Less.js through Java 1.8 Nashorn JS engine.
 
+## Features
+
+- Load imports from classpath
+  - Loading order. `@import "foo";`
+    1. check if `src/less/foo.less` exists
+    2. try `(io/resource "foo.less")`
+    3. try `(io/resource "src/less/foo.less")`
+    4. check if webjars asset map contains `foo`
+  - You should be able to depend on `[org.webjars/bootstrap "3.3.1"]`
+    and use `@import "bootstrap/less/bootstrap";`
+
 ## TODO
 
 - [ ] Update to latest LESS
@@ -18,7 +29,7 @@ equivalent `.css` file.
   - Parhaps we'll need to package ourselves
   - https://github.com/nodyn/jvm-npm allows us to use Node modules
 - [ ] Separate JS engine stuff to small library
-- [ ] How to read files from classpath
+- [x] How to read files from classpath
   - E.g. Bootstrap as maven dependency from Webjars
   - Create custom "less-nashorn" implementing fileManager.loadFile which tries to locate files in classpath (https://github.com/less/less.js/blob/master/lib/less-node/file-manager.js)
 - [ ] Set main file manually

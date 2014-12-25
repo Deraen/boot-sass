@@ -18,10 +18,12 @@ var lessc = {};
     var find_import = RT['var']('deraen.boot-less.impl', 'find-import');
     less.Parser.fileLoader = function (file, currentFileInfo, callback, env) {
         var result = find_import.invoke(file, currentFileInfo);
+        // print("search", file, "current-dir", currentFileInfo.currentDirectory);
         if (!result) {
             callback({ type: 'File', message: '"' + less.modules.path.basename(file) + '" wasn\'t found' });
             return;
         }
+        // print("found", result.path, "new-current-directory", result.parent);
 
         var href = result.path;
         var data = null;
@@ -31,7 +33,7 @@ var lessc = {};
             callback({ type: 'File', message: '"' + less.modules.path.basename(href) + '" couln\'t be read' });
             return;
         }
-        var path = less.modules.path.dirname(href);
+        var path = result.parent;
 
         var newFileInfo = {
             currentDirectory: path,
