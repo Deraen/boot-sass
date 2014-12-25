@@ -7,12 +7,14 @@
     [java.io IOException]
     [java.net JarURLConnection URL URI]
     [org.webjars WebJarAssetLocator]
-    [com.github.sommeri.less4j LessCompiler Less4jException LessSource LessSource$FileNotFound LessSource$CannotReadFile LessSource$StringSourceException]
+    [com.github.sommeri.less4j
+     LessCompiler LessCompiler$Configuration Less4jException
+     LessSource LessSource$FileNotFound LessSource$CannotReadFile LessSource$StringSourceException]
     [com.github.sommeri.less4j.core DefaultLessCompiler]))
 
 (defn find-local-file [file current-dir]
   (let [f (io/file current-dir file)]
-    (when (.exists f)
+    (if (.exists f)
       [(.toURI f) (.getParent f) :file])))
 
 (defn find-resource [file current-dir]
@@ -21,9 +23,8 @@
       (let [jar-url (.openConnection url)
             ; FIXME: regexing url
             [_ parent _] (re-find #"(.*)/([^/]*)$" (.getEntryName jar-url))]
-        (do
-          (util/dbug "Found %s from resources\n" url)
-          [(.toURI url) parent])))))
+        (util/dbug "Found %s from resources\n" url)
+        [(.toURI url) parent]))))
 
 ; Source: https://github.com/cljsjs/boot-cljsjs/blob/master/src/cljsjs/impl/webjars.clj
 
@@ -65,12 +66,12 @@
   (proxy [LessSource] []
     (relativeSource ^LessSource [^String import-filename]
       (util/dbug "importing %s at %s\n" import-filename parent)
-      (let [[uri parent]
-            (or (find-local-file import-filename parent)
-                (find-resource import-filename parent)
-                (find-webjars import-filename)
-                (not-found!))]
-        (boot-less-source uri parent)))
+      (if-let [[uri parent]
+               (or (find-local-file import-filename parent)
+                   (find-resource import-filename parent)
+                   (find-webjars import-filename))]
+        (boot-less-source uri parent)
+        (not-found!)))
     (getContent ^String []
       (try
         (slurp uri)
@@ -87,14 +88,27 @@
       (let [[_ name] (re-find #"([^/]*)$" (.toString uri))]
         name))))
 
-(defn less-compile [path target-dir relative-path {:keys [source-map]}]
+(defn- build-configuration ^LessCompiler$Configuration
+  [{:keys [source-map compression]}]
+  (let [config (LessCompiler$Configuration.)
+        source-map-config (.getSourceMapConfiguration config)]
+    (doto config
+      (.setCompressing (if compression true false)))
+    (doto source-map-config
+      (.setLinkSourceMap (if source-map true false))
+      (.setIncludeSourcesContent true))
+    config))
+
+(defn less-compile [path target-dir relative-path {:keys [source-map] :as options}]
   (let [input-file (io/file path)
         output-file (io/file target-dir (string/replace relative-path #"\.main\.less$" ".css"))
         source-map-output (io/file target-dir (string/replace relative-path #"\.main\.less$" ".main.css.map"))]
     (io/make-parents output-file)
     (try
       (let [result (-> (DefaultLessCompiler.)
-                       (.compile (boot-less-source (.toURI input-file) (.getParent input-file))))]
+                       (.compile
+                         (boot-less-source (.toURI input-file) (.getParent input-file))
+                         (build-configuration options)))]
         (spit output-file (.getCss result))
         (when source-map (spit source-map-output (.getSourceMap result)))
         (doseq [warn (.getWarnings result)]

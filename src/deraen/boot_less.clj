@@ -19,7 +19,8 @@
 
 (core/deftask less
   "Compile Less code."
-  [s source-map bool "Whether to generate source-maps"]
+  [s source-map bool "Whether to generate source-maps"
+   c compression bool "Compress output"]
   (let [output-dir  (core/temp-dir!)
         p           (-> (core/get-env)
                         (update-in [:dependencies] into deps)
@@ -40,7 +41,8 @@
                 ~(.getPath (tmpd/file f))
                 ~(.getPath output-dir)
                 ~(tmpd/path f)
-                {:options ~source-map})))))
+                {:source-map ~source-map
+                 :compression ~compression})))))
         (-> fileset
             (core/add-resource output-dir)
             core/commit!))))
