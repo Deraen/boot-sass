@@ -9,7 +9,8 @@
 
 (def ^:private deps
   '[[org.webjars/webjars-locator "0.19"]
-    [org.slf4j/slf4j-nop "1.7.7"]])
+    [org.slf4j/slf4j-nop "1.7.7"]
+    [slingshot "0.12.1"]])
 
 (core/deftask less
   "Compile Less code."

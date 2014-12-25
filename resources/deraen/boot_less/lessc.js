@@ -5,11 +5,6 @@ var lessc = {};
     var RT;
     var type;
 
-    if ((typeof importClass) !== 'undefined') {
-        importClass(Packages.clojure.lang.RT);
-        RT = Packages.clojure.lang.RT;
-        type = 'rhino';
-    }
     if ((typeof Java) !== 'undefined' && Java.type) {
         RT = Java.type('clojure.lang.RT');
         type = 'nashorn';
@@ -25,30 +20,28 @@ var lessc = {};
         }
         // print("found", result.path, "new-current-directory", result.parent);
 
-        var href = result.path;
         var data = null;
         try {
-            data = lessc.read(href);
+            data = lessc.read(result.path);
         } catch (e) {
-            callback({ type: 'File', message: '"' + less.modules.path.basename(href) + '" couln\'t be read' });
+            callback({ type: 'File', message: '"' + less.modules.path.basename(result.path) + '" couln\'t be read' });
             return;
         }
-        var path = result.parent;
 
         var newFileInfo = {
-            currentDirectory: path,
-            filename: href
+            currentDirectory: result.parent,
+            filename:         result.path
         };
 
         if (currentFileInfo) {
-            newFileInfo.entryPath = currentFileInfo.entryPath;
-            newFileInfo.rootpath = currentFileInfo.rootpath;
+            newFileInfo.entryPath    = currentFileInfo.entryPath;
+            newFileInfo.rootpath     = currentFileInfo.rootpath;
             newFileInfo.rootFilename = currentFileInfo.rootFilename;
             newFileInfo.relativeUrls = currentFileInfo.relativeUrls;
         } else {
-            newFileInfo.entryPath = path;
-            newFileInfo.rootpath = less.rootpath || path;
-            newFileInfo.rootFilename = href;
+            newFileInfo.entryPath    = result.parent;
+            newFileInfo.rootpath     = less.rootpath || result.parent;
+            newFileInfo.rootFilename = result.path;
             newFileInfo.relativeUrls = env.relativeUrls;
         }
 
@@ -59,12 +52,13 @@ var lessc = {};
         }
 
         try {
-            callback(null, data, href, newFileInfo, { lastModified: 0 });
+            callback(null, data, result.path, newFileInfo, { lastModified: 0 });
         } catch (e) {
-            callback(e, null, href);
+            callback(e, null, result.path);
         }
     };
 
+    /* from lein-less */
     /* derived from lessc-rhino */
     lessc.formatError = function formatError(ctx, options) {
         options = options || {};
@@ -149,19 +143,16 @@ var lessc = {};
             parser.parse(input, function (e, root) {
                 if (e) {
                     lessc.error(e);
-                }
-                else {
+                } else {
                     var result = root.toCSS(options);
                     lessc.write(out_file, result);
                     lessc.quit(0);
                 }
             });
-        }
-        catch (e) {
+        } catch (e) {
             if (e === quit) {
                 return 0;
-            }
-            else {
+            } else {
                 lessc.error(e, options);
             }
         }

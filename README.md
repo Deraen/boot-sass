@@ -23,15 +23,21 @@ equivalent `.css` file.
 ## TODO
 
 - [ ] Update to latest LESS
-- [ ] Handle errors
-- [ ] Use non-bundled Less files
-  - Webjars has less-node, but the files are not concatenated
-  - Parhaps we'll need to package ourselves
-  - https://github.com/nodyn/jvm-npm allows us to use Node modules
+  - It's unclear whether the latest Less.js supports Rhino less/less.js#2316
+  - Nashorn support? less/less.js#2063
+- [x] Handle errors
+  - [x] Trying to import non-existant file
+  - [x] Missing closing `}`
+  - [x] Missing `;` between declarations
+  - [ ] Referencing non-existant variable
 - [ ] Separate JS engine stuff to small library
-- [x] How to read files from classpath
-  - E.g. Bootstrap as maven dependency from Webjars
-  - Create custom "less-nashorn" implementing fileManager.loadFile which tries to locate files in classpath (https://github.com/less/less.js/blob/master/lib/less-node/file-manager.js)
 - [ ] Set main file manually
   - If no main file set, other files should start with \_
   - if set, other files can be named in any way
+
+## License
+
+Copyright © 2014 Juho Teperi
+Copyright © 2013 Montoux Ltd. ([Lein-less](https://github.com/montoux/lein-less))
+
+Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.

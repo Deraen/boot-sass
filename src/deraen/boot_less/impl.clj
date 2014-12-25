@@ -1,15 +1,52 @@
 (ns deraen.boot-less.impl
   (:require
     [clojure.java.io :as io]
-    [clojure.string :as string])
+    [clojure.string :as string]
+    [slingshot.slingshot :refer [throw+ try+]])
   (:import
     [org.webjars WebJarAssetLocator]
     [java.net URL JarURLConnection]
-    [javax.script ScriptEngineManager ScriptEngine ScriptContext Bindings]
+    [javax.script ScriptEngineManager ScriptEngine ScriptContext Bindings ScriptException]
     [jdk.nashorn.api.scripting ScriptObjectMirror JSObject]))
 
 (def less-js "deraen/boot_less/less-rhino-1.7.2.js")
 (def lessc-js "deraen/boot_less/lessc.js")
+
+;; From lein-less
+(defn- get-class [class-name]
+  (try (Class/forName class-name)
+       (catch ClassNotFoundException _ nil)))
+
+(defmacro dynamic-instance?
+  "Given a class name, attempts a dynamic lookup of the class, and if found does an instance? test against the object."
+  [class-name obj]
+  `(some-> (get-class ~class-name) (instance? ~obj)))
+
+;; From lein-less
+(defn error!
+  [error message]
+  (let [cause (when (instance? Throwable error) (.getCause ^Throwable error))]
+    (cond
+      (not (instance? Throwable error))
+      (throw+ {:type :less-error :message (str message)})
+
+      (= (:type (meta error)) :less-error)
+      (throw error)
+
+      (instance? ScriptException error)
+      (if cause
+        (recur cause message)
+        (throw+ {:type :less-error :message (str message) :original error}))
+
+      (or (dynamic-instance? "jdk.nashorn.api.scripting.NashornException" error)
+          (dynamic-instance? "sun.org.mozilla.javascript.internal.JavaScriptException" error))
+      (throw+ {:type :less-error :message (str message) :original error})
+
+      (or (dynamic-instance? "org.mozilla.javascript.WrappedException" error)
+          (dynamic-instance? "sun.org.mozilla.javascript.internal.WrappedException" error))
+      (recur (.getWrappedException error) message)
+
+      :default (throw error))))
 
 (def ^:private ^ScriptEngineManager engine-manager (ScriptEngineManager.))
 
@@ -18,7 +55,10 @@
 
 (defn eval!
   [engine js-expression]
-  (.eval engine js-expression))
+  (try
+    (.eval engine js-expression)
+    (catch Exception e
+      (error! e (.getMessage e)))))
 
 (defn eval-file!
   [engine resource]
@@ -29,6 +69,8 @@
       (if resource-name
         (.put bindings ScriptEngine/FILENAME resource-name))
       (.eval engine reader)
+      (catch Exception e
+        (error! e (.getMessage e)))
       (finally (.remove bindings ScriptEngine/FILENAME)))))
 
 (def ^:private stored-engine (atom nil))
@@ -48,10 +90,10 @@
   (js-engine)
   (let [output-file (io/file target-dir (change-file-ext relative-path "css"))]
     (io/make-parents output-file)
-    (eval! @stored-engine (format "lessc.compile('%s', '%s');" path output-file))))
-
-(defn error! [error message]
-  (println error message))
+    (try+
+      (eval! @stored-engine (format "lessc.compile('%s', '%s');" path output-file))
+      (catch [:type :less-error] {:keys [message] :as e}
+        (println message)))))
 
 (defn nashorn->clj [obj]
   (into {} (map (fn [k]

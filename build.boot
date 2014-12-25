@@ -17,8 +17,8 @@
        :description "Boot task to compile Less code to Css. Uses LESS.js through Nashorn."
        :url         "https://github.com/deraen/boot-less"
        :scm         {:url "https://github.com/deraen/boot-less"}
-       :license     {:name "The MIT License (MIT)"
-                     :url "http://opensource.org/licenses/mit-license.php"}})
+       :license     {:name "Eclipse Public License"
+                     :url  "http://www.eclipse.org/legal/epl-v10.html"}})
 
 (deftask dev
   "Dev process"
