@@ -5,15 +5,15 @@
 
 * Provides the `less` task
 * Reads `.less` files from fileset...
-* For each `.less` file not starting with \_ (underscore), creates
-equivalent `.css` file.
+* For each `.main.less` creates equivalent `.css` file.
 * Uses Less.js through Java 1.8 Nashorn JS engine.
+  * No Rhino support for now, thus 1.8 is required
 
 ## Features
 
 - Load imports from classpath
   - Loading order. `@import "{name}";` at `{path}`.
-    1. check if `{path}/{name}.less` exists
+    1. check if file `{path}/{name}.less` exists
     2. try `(io/resource "{name}.less")`
     3. try `(io/resource "{path}/{name}.less")`
     4. check if webjars asset map contains `{name}`
@@ -23,22 +23,17 @@ equivalent `.css` file.
 ## TODO
 
 - [ ] Update to latest LESS
-  - It's unclear whether the latest Less.js supports Rhino less/less.js#2316
-  - Nashorn support? less/less.js#2063
+  - Blocked. [less/less.js#2316](https://github.com/less/less.js/issues/2316)
 - [x] Handle errors
   - [x] Trying to import non-existant file
   - [x] Missing closing `}`
   - [x] Missing `;` between declarations
   - [ ] Referencing non-existant variable
 - [ ] Separate JS engine stuff to small library
-- [ ] Set main file manually
-  - If no main file set, other files should start with \_
-  - if set, other files can be named in any way
 
 ## License
 
-Copyright © 2014 Juho Teperi
-
+Copyright © 2014 Juho Teperi<br>
 Copyright © 2013 Montoux Ltd. ([Lein-less](https://github.com/montoux/lein-less))
 
 Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.

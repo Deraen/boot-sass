@@ -15,8 +15,7 @@
 (defn- find-mainfiles [fs]
   (->> fs
        core/input-files
-       (core/by-ext [".less"])
-       (core/not-by-re [#"_.*"])))
+       (core/by-ext [".main.less"])))
 
 (core/deftask less
   "Compile Less code."

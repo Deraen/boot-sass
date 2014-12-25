@@ -83,12 +83,9 @@
       (reset! stored-engine engine)))
   @stored-engine)
 
-(defn- change-file-ext [path new-ext]
-  (string/replace path #"\.[^\.]+$" (str "." new-ext)))
-
 (defn less-compile [path target-dir relative-path]
   (js-engine)
-  (let [output-file (io/file target-dir (change-file-ext relative-path "css"))]
+  (let [output-file (io/file target-dir (string/replace relative-path #"\.main\.less$" ".css"))]
     (io/make-parents output-file)
     (try+
       (eval! @stored-engine (format "lessc.compile('%s', '%s');" path output-file))
