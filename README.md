@@ -38,6 +38,7 @@ equivalent `.css` file.
 ## License
 
 Copyright © 2014 Juho Teperi
+
 Copyright © 2013 Montoux Ltd. ([Lein-less](https://github.com/montoux/lein-less))
 
 Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.

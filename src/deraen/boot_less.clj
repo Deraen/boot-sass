@@ -12,6 +12,12 @@
     [org.slf4j/slf4j-nop "1.7.7"]
     [slingshot "0.12.1"]])
 
+(defn- find-mainfiles [fs]
+  (->> fs
+       core/input-files
+       (core/by-ext [".less"])
+       (core/not-by-re [#"_.*"])))
+
 (core/deftask less
   "Compile Less code."
   []
@@ -28,18 +34,13 @@
                       (core/by-ext [".less"]))]
         (reset! last-less fileset)
         (when (seq less)
-          (util/info (str "Compiling {less}... " (count less) " changed files.\n"))
-          (let [main-files (->> fileset
-                                core/input-files
-                                (core/by-ext [".less"])
-                                (core/not-by-re [#"_.*"]))]
-            (doseq [f main-files]
-              (pod/with-call-in
-                @p
-                (deraen.boot-less.impl/less-compile
-                  ~(.getPath (tmpd/file f))
-                  ~(.getPath output-dir)
-                  ~(tmpd/path f))))))
+          (util/info "Compiling {less}... %d changed files.\n" (count less))
+          (doseq [f (find-mainfiles fileset)]
+            (pod/with-call-in @p
+              (deraen.boot-less.impl/less-compile
+                ~(.getPath (tmpd/file f))
+                ~(.getPath output-dir)
+                ~(tmpd/path f))))))
         (-> fileset
             (core/add-resource output-dir)
-            core/commit!)))))
+            core/commit!))))
