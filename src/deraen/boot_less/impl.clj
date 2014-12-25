@@ -93,9 +93,9 @@
   (let [config (LessCompiler$Configuration.)
         source-map-config (.getSourceMapConfiguration config)]
     (doto config
-      (.setCompressing (if compression true false)))
+      (.setCompressing (boolean compression)))
     (doto source-map-config
-      (.setLinkSourceMap (if source-map true false))
+      (.setLinkSourceMap (boolean source-map))
       (.setIncludeSourcesContent true))
     config))
 

@@ -19,8 +19,8 @@
 
 (core/deftask less
   "Compile Less code."
-  [s source-map bool "Whether to generate source-maps"
-   c compression bool "Compress output"]
+  [s source-map  bool "Create source-map for compiled CSS."
+   c compression bool "Compress compiled CSS using simple compression."]
   (let [output-dir  (core/temp-dir!)
         p           (-> (core/get-env)
                         (update-in [:dependencies] into deps)
