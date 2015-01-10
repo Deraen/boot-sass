@@ -14,6 +14,9 @@
  c compression bool "Compress compiled CSS using simple compression."]
 ```
 
+To create css file `public/css/main.css` have the less file on path `public/css/main.main.less` or use sift task to move the css file:
+`(comp (less) (sift :move {#"main.css" "public/css/main.css"}))`
+
 ## Features
 
 - Load imports from classpath
@@ -22,6 +25,8 @@
     2. try `(io/resource "{name}.less")`
     3. try `(io/resource "{path}/{name}.less")`
     4. check if webjars asset map contains `{name}`
+      - Resource `META-INF/resources/webjars/{package}/{version}/{path}` can be referred using `{package}/{path}`
+      - E.g. `bootstrap/less/bootstrap.less` => `META-INF/resources/webjars/bootstrap/3.3.1/less/bootstrap.less`
   - You should be able to depend on `[org.webjars/bootstrap "3.3.1"]`
     and use `@import "bootstrap/less/bootstrap";`
   - Use boot debug to find what is being loaded:
