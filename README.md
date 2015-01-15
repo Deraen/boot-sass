@@ -34,6 +34,6 @@ To create css file `public/css/main.css` have the less file on path `public/css/
 
 ## License
 
-Copyright © 2014 Juho Teperi
+Copyright © 2014-2015 Juho Teperi
 
 Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.

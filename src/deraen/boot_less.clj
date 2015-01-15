@@ -10,7 +10,7 @@
 (def ^:private deps
   '[[org.webjars/webjars-locator "0.19"]
     [org.slf4j/slf4j-nop "1.7.7"]
-    [com.github.sommeri/less4j "1.8.4"]])
+    [com.github.sommeri/less4j "1.8.5"]])
 
 (defn- find-mainfiles [fs]
   (->> fs
