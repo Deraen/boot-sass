@@ -32,6 +32,18 @@ To create css file `public/css/main.css` have the less file on path `public/css/
   - Use boot debug to find what is being loaded:
     `boot -vvv less`
 
+## FAQ
+
+### Log configuration
+
+If you are using some logging stuff it might be that library used by
+less4j will write lots of stuff to your log, then you should add the following
+rule to your `logback.xml`:
+
+```xml
+  <logger name="org.apache.commons.beanutils.converters" level="INFO"/>
+```
+
 ## License
 
 Copyright © 2014-2015 Juho Teperi

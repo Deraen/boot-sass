@@ -8,9 +8,7 @@
    [boot.tmpdir     :as tmpd]))
 
 (def ^:private deps
-  '[[org.webjars/webjars-locator "0.19"]
-    [org.slf4j/slf4j-nop "1.7.7"]
-    [com.github.sommeri/less4j "1.8.5"]])
+  '[[deraen/less4clj "0.2.0"]])
 
 (defn- find-mainfiles [fs]
   (->> fs
@@ -37,7 +35,7 @@
           (util/info "Compiling {less}... %d changed files.\n" (count less))
           (doseq [f (find-mainfiles fileset)]
             (pod/with-call-in @p
-              (deraen.boot-less.impl/less-compile
+              (less4clj.core/less-compile
                 ~(.getPath (tmpd/file f))
                 ~(.getPath output-dir)
                 ~(tmpd/path f)
