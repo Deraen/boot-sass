@@ -19,7 +19,7 @@
   "Compile Less code."
   [s source-map  bool "Create source-map for compiled CSS."
    c compression bool "Compress compiled CSS using simple compression."]
-  (let [output-dir  (core/temp-dir!)
+  (let [output-dir  (core/tmp-dir!)
         p           (-> (core/get-env)
                         (update-in [:dependencies] into deps)
                         pod/make-pod

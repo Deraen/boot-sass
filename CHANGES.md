@@ -1,3 +1,7 @@
+## 0.4.0 (13.6.2015)
+
+- Use Boot 2.0.0 API
+
 ## 0.3.0 (3.3.2015)
 
 - Uses now [less4clj](https://github.com/Deraen/less4clj)
