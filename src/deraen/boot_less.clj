@@ -8,7 +8,7 @@
    [boot.tmpdir     :as tmpd]))
 
 (def ^:private deps
-  '[[deraen/less4clj "0.3.0"]])
+  '[[deraen/less4clj "0.3.1"]])
 
 (defn- find-mainfiles [fs]
   (->> fs
@@ -35,7 +35,7 @@
           (util/info "Compiling {less}... %d changed files.\n" (count less))
           (doseq [f (find-mainfiles fileset)]
             (pod/with-call-in @p
-              (less4clj.core/less-compile
+              (less4clj.core/less-compile-to-file
                 ~(.getPath (tmpd/file f))
                 ~(.getPath output-dir)
                 ~(tmpd/path f)
