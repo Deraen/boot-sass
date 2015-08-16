@@ -1,3 +1,7 @@
+## 0.4.1 (16.8.2015)
+
+- Use latest less4clj (less4j 1.14.0)
+
 ## 0.4.0 (13.6.2015)
 
 - Use Boot 2.0.0 API

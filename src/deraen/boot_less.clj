@@ -8,7 +8,7 @@
    [boot.tmpdir     :as tmpd]))
 
 (def ^:private deps
-  '[[deraen/less4clj "0.3.1"]])
+  '[[deraen/less4clj "0.3.2"]])
 
 (defn- find-mainfiles [fs]
   (->> fs

@@ -1,12 +1,13 @@
 (set-env!
   :resource-paths #{"src"}
   :dependencies   '[[org.clojure/clojure "1.6.0"       :scope "provided"]
-                    [boot/core           "2.1.2"       :scope "provided"]
-                    [adzerk/bootlaces    "0.1.8"       :scope "test"]])
+                    [boot/core           "2.2.0"       :scope "provided"]
+                    [adzerk/bootlaces    "0.1.11"      :scope "test"]
+                    [deraen/less4clj     "0.3.2"       :scope "test"]])
 
 (require '[adzerk.bootlaces :refer :all])
 
-(def +version+ "0.4.0")
+(def +version+ "0.4.1")
 
 (bootlaces! +version+)
 
