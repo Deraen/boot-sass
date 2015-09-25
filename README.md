@@ -1,48 +1,35 @@
-# boot-less
-[![Clojars Project](http://clojars.org/deraen/boot-less/latest-version.svg)](http://clojars.org/deraen/boot-less)
+# boot-scss
+[![Clojars Project](http://clojars.org/deraen/boot-sass/latest-version.svg)](http://clojars.org/deraen/boot-sass)
 
-[Boot](https://github.com/boot-clj/boot) task to compile Less.
+[Boot](https://github.com/boot-clj/boot) task to compile sass.
 
-* Provides the `less` task
-* For each `.main.less` in fileset creates equivalent `.css` file.
-* Uses [Less4j](https://github.com/SomMeri/less4j) Java implementation of Less compiler
+* Provides the `sass` task
+* For each `.scss` file not starting with `_` in fileset creates equivalent `.css` file.
+* Uses [jsass](https://github.com/bit3/jsass) through [sass4clj](https://github.com/Deraen/sass4clj) wrapper
 
 ## Usage
 
 ```clj
-[s source-map  bool "Create source-map for compiled CSS."
- c compression bool "Compress compiled CSS using simple compression."]
+[]
 ```
 
-To create css file `public/css/main.css` have the less file on path `public/css/main.main.less` or use sift task to move the css file:
-`(comp (less) (sift :move {#"main.css" "public/css/main.css"}))`
+To create css file `public/css/main.css` have the scss file on path `public/css/main.scss` or use sift task to move the css file:
+`(comp (sass) (sift :move {#"main.css" "public/css/main.css"}))`
 
 ## Features
 
 - Load imports from classpath
   - Loading order. `@import "{name}";` at `{path}`.
-    1. check if file `{path}/{name}.less` exists
-    2. try `(io/resource "{name}.less")`
-    3. try `(io/resource "{path}/{name}.less")`
+    1. check if file `{path}/{name}.scss` exists
+    2. try `(io/resource "{name}.scss")`
+    3. try `(io/resource "{path}/{name}.scss")`
     4. check if webjars asset map contains `{name}`
       - Resource `META-INF/resources/webjars/{package}/{version}/{path}` can be referred using `{package}/{path}`
-      - E.g. `bootstrap/less/bootstrap.less` => `META-INF/resources/webjars/bootstrap/3.3.1/less/bootstrap.less`
-  - You should be able to depend on `[org.webjars/bootstrap "3.3.1"]`
-    and use `@import "bootstrap/less/bootstrap";`
+      - E.g. `bootstrap/scss/bootstrap.scss` => `META-INF/resources/webjars/bootstrap/4.0.0-alpha/scss/bootstrap.scss`
+  - You should be able to depend on `[org.webjars.bower/bootstrap "4.0.0-alpha"]`
+    and use `@import "bootstrap/scss/bootstrap";`
   - Use boot debug to find what is being loaded:
-    `boot -vvv less`
-
-## FAQ
-
-### Log configuration
-
-If you are using some logging stuff it might be that library used by
-less4j will write lots of stuff to your log, then you should add the following
-rule to your `logback.xml`:
-
-```xml
-  <logger name="org.apache.commons.beanutils.converters" level="INFO"/>
-```
+    `boot -vvv scss`
 
 ## License
 

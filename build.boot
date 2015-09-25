@@ -3,20 +3,20 @@
   :dependencies   '[[org.clojure/clojure "1.6.0"       :scope "provided"]
                     [boot/core           "2.2.0"       :scope "provided"]
                     [adzerk/bootlaces    "0.1.11"      :scope "test"]
-                    [deraen/less4clj     "0.3.2"       :scope "test"]])
+                    [deraen/sass4clj     "0.1.0-SNAPSHOT"       :scope "test"]])
 
 (require '[adzerk.bootlaces :refer :all])
 
-(def +version+ "0.4.1")
+(def +version+ "0.1.0-SNAPSHOT")
 
 (bootlaces! +version+)
 
 (task-options!
-  pom {:project     'deraen/boot-less
+  pom {:project     'deraen/boot-sass
        :version     +version+
-       :description "Boot task to compile Less code to Css. Uses Less4j Java implementation of Less compiler."
-       :url         "https://github.com/deraen/boot-less"
-       :scm         {:url "https://github.com/deraen/boot-less"}
+       :description ""
+       :url         "https://github.com/deraen/boot-sass"
+       :scm         {:url "https://github.com/deraen/boot-sass"}
        :license     {"Eclipse Public License" "http://www.eclipse.org/legal/epl-v10.html"}})
 
 (deftask dev
