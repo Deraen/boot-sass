@@ -4,8 +4,7 @@
    [clojure.java.io :as io]
    [boot.pod        :as pod]
    [boot.core       :as core]
-   [boot.util       :as util]
-   [boot.tmpdir     :as tmpd]))
+   [boot.util       :as util]))
 
 (def ^:private deps
   '[[deraen/sass4clj "0.1.0-SNAPSHOT"]])
@@ -41,9 +40,9 @@
           (doseq [f (find-mainfiles fileset)]
             (pod/with-call-in @p
               (sass4clj.core/sass-compile-to-file
-                ~(.getPath (tmpd/file f))
+                ~(.getPath (core/tmp-file f))
                 ~(.getPath output-dir)
-                ~(tmpd/path f)
+                ~(core/tmp-path f)
                 {:verbosity ~(deref util/*verbosity*)})))))
         (-> fileset
             (core/add-resource output-dir)
