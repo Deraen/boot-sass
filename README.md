@@ -1,4 +1,4 @@
-# boot-scss
+# boot-sass
 [![Clojars Project](http://clojars.org/deraen/boot-sass/latest-version.svg)](http://clojars.org/deraen/boot-sass)
 
 [Boot](https://github.com/boot-clj/boot) task to compile sass.
