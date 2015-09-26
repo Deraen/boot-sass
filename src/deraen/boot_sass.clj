@@ -8,7 +8,7 @@
    [clojure.string  :as string]))
 
 (def ^:private deps
-  '[[deraen/sass4clj "0.1.0-SNAPSHOT"]])
+  '[[deraen/sass4clj "0.1.0"]])
 
 (defn by-pre
   [exts files & [negate?]]
