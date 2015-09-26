@@ -6,6 +6,7 @@
 * Provides the `sass` task
 * For each `.scss` or `.sass` file not starting with `_` in fileset creates equivalent `.css` file.
 * Uses [jsass](https://github.com/bit3/jsass) through [sass4clj](https://github.com/Deraen/sass4clj) wrapper
+* For parallel leiningen task check [lein-sass4clj](https://github.com/Deraen/lein-sass4clj)
 
 ## Usage
 
