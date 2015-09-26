@@ -4,7 +4,8 @@
    [clojure.java.io :as io]
    [boot.pod        :as pod]
    [boot.core       :as core]
-   [boot.util       :as util]))
+   [boot.util       :as util]
+   [clojure.string  :as string]))
 
 (def ^:private deps
   '[[deraen/sass4clj "0.1.0-SNAPSHOT"]])
@@ -17,7 +18,7 @@
   (by-pre ["_"]
           (->> fs
                core/input-files
-               (core/by-ext [".scss"]))
+               (core/by-ext [".scss" ".sass"]))
           true))
 
 (core/deftask sass
@@ -33,16 +34,18 @@
       (let [sources (->> fileset
                          (core/fileset-diff @prev)
                          core/input-files
-                         (core/by-ext [".scss"]))]
+                         (core/by-ext [".scss" ".sass"]))]
         (reset! prev fileset)
         (when (seq sources)
           (util/info "Compiling {sass}... %d changed files.\n" (count sources))
-          (doseq [f (find-mainfiles fileset)]
+          (doseq [f (find-mainfiles fileset)
+                  :let [input-path (.getPath (core/tmp-file f))
+                        output-rel-path (string/replace (core/tmp-path f) #"\.(sccs|sass)$" ".css")
+                        output-path (.getPath (io/file output-dir output-rel-path))]]
             (pod/with-call-in @p
               (sass4clj.core/sass-compile-to-file
-                ~(.getPath (core/tmp-file f))
-                ~(.getPath output-dir)
-                ~(core/tmp-path f)
+                ~input-path
+                ~output-path
                 {:verbosity ~(deref util/*verbosity*)})))))
         (-> fileset
             (core/add-resource output-dir)
