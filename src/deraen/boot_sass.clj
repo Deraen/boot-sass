@@ -22,8 +22,14 @@
           true))
 
 (core/deftask sass
-  "Compile Sass code."
-  []
+  "Compile Sass code.
+
+   Output-styles:
+   - :nested
+   - :compact
+   - :expanded
+   - :compressed"
+  [o output-style STYLE kw "Set output-style"]
   (let [output-dir  (core/tmp-dir!)
         p           (-> (core/get-env)
                         (update-in [:dependencies] into deps)
@@ -46,7 +52,8 @@
               (sass4clj.core/sass-compile-to-file
                 ~input-path
                 ~output-path
-                {:verbosity ~(deref util/*verbosity*)})))))
+                {:verbosity ~(deref util/*verbosity*)
+                 :output-style ~output-style})))))
         (-> fileset
             (core/add-resource output-dir)
             core/commit!))))
