@@ -14,7 +14,7 @@
 (task-options!
   pom {:project     'deraen/boot-sass
        :version     +version+
-       :description ""
+       :description "Boot task to compile sass."
        :url         "https://github.com/deraen/boot-sass"
        :scm         {:url "https://github.com/deraen/boot-sass"}
        :license     {"Eclipse Public License" "http://www.eclipse.org/legal/epl-v10.html"}})
