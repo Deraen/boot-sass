@@ -10,10 +10,6 @@
 
 ## Usage
 
-```clj
-[]
-```
-
 To create css file `public/css/main.css` have the scss file on path `public/css/main.scss` or use sift task to move the css file:
 `(comp (sass) (sift :move {#"main.css" "public/css/main.css"}))`
 
