@@ -1,6 +1,8 @@
 # boot-sass
 [![Clojars Project](http://clojars.org/deraen/boot-sass/latest-version.svg)](http://clojars.org/deraen/boot-sass)
 
+# [Moved to Deraen/sass4clj](https://github.com/Deraen/sass4clj)
+
 [Boot](https://github.com/boot-clj/boot) task to compile sass.
 
 * Provides the `sass` task
